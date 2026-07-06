@@ -20,7 +20,7 @@ Trong giao dien:
 ```bash
 python danielevsky_gui.py --input matrix_input.txt --output danielevsky_solution.md
 ```
-
+Đơn giản hơn thì chỉ cần vào file có chữ gui rồi ấn run là được
 ## Dinh dang input
 
 Nhap tung hang cua ma tran tren mot dong:
