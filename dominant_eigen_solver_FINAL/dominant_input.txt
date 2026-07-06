@@ -1,0 +1,13 @@
+matrix:
+2 1 0
+1 2 1
+0 1 2
+
+x0:
+1 1 1
+
+tol: 1e-7
+max_iter: 30
+deflation_count: 2
+mode: exam
+show_special_checks: auto

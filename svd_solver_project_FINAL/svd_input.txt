@@ -1,0 +1,12 @@
+matrix:
+3 0
+4 0
+0 2
+
+tol: 1e-7
+rank_tol: 1e-9
+max_iter: 100
+components: 2
+mode: exam
+pinv: true
+condition_number: true
