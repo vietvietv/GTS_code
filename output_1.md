@@ -1,40 +1,333 @@
-=== CHƯƠNG TRÌNH GIẢI HỆ PHƯƠNG TRÌNH PHI TUYẾN (NEWTON CẢI TIẾN) ===
+# Lời giải tìm giá trị riêng trội
 
+> Các phép tính bên trong dùng giá trị gốc. Ma trận trình bày 4 chữ số thập phân; các số liệu khác 7 chữ số thập phân.
 
-============================================================
-### 1. Thông tin hệ phương trình và Thiết lập ban đầu
-* **Hệ phương trình:** $F(X) = \left[\begin{matrix}x^{2} + 2 y^{2} - 8 & x y + 5 y^{2} - 4\end{matrix}\right]^T$
-* **Ma trận Jacobi tổng quát:** $J(X) = \left[\begin{matrix}2 x & 4 y\\y & x + 10 y\end{matrix}\right]$
-* **Giá trị khởi đầu:** $X_0 = \begin{pmatrix} 2.3000000 \\ -1.1000000 \end{pmatrix}$
+## Bài toán
 
-### 2. Chi tiết bước lặp 1 (k = 0)
-* **Giá trị hàm số tại $X_0$:**
-  $$F(X_0) = \begin{pmatrix} -0.2900000 \\ -0.4800000 \end{pmatrix}$$
-* **Ma trận Jacobi tại $X_0$:**
-  $$J(X_0) = \begin{pmatrix} 4.6000000 & -4.4000000 \\ -1.1000000 & -8.7000000 \end{pmatrix}$$
-* **Ma trận nghịch đảo Jacobi (cố định cho mọi bước):**
-  $$J(X_0)^{-1} = \begin{pmatrix} 0.1939367 & -0.0980829 \\ -0.0245207 & -0.1025412 \end{pmatrix}$$
-* **Tính toán nghiệm xấp xỉ $X_1$:**
-  $$X_1 = X_0 - J(X_0)^{-1} \cdot F(X_0)$$
-  $$X_1 = \begin{pmatrix} 2.3000000 \\ -1.1000000 \end{pmatrix} - \begin{pmatrix} 0.1939367 & -0.0980829 \\ -0.0245207 & -0.1025412 \end{pmatrix} \cdot \begin{pmatrix} -0.2900000 \\ -0.4800000 \end{pmatrix}$$
-  $$X_1 = \begin{pmatrix} 2.3091618 \\ -1.1563308 \end{pmatrix}$$
+Cho ma trận
 
-### 3. Các bước lặp tiếp theo
-Sử dụng công thức lặp Newton cải tiến: $X_{k+1} = X_k - J(X_0)^{-1} F(X_k)$
+$$
+A=\begin{pmatrix}
+15.0000 & 4.0000 & 11.0000 & 13.0000\\
+4.0000 & 30.0000 & 14.0000 & 16.0000\\
+11.0000 & 14.0000 & 19.0000 & 14.0000\\
+13.0000 & 16.0000 & 14.0000 & 34.0000
+\end{pmatrix}
+$$
 
-* **Tại bước $k=1$ (Tìm $X_2$):**
-  - $F(X_1) = \begin{pmatrix} 0.0064303 \\ 0.0153497 \end{pmatrix}^T$
-  - $X_2 = \begin{pmatrix} 2.3094203 \\ -1.1545992 \end{pmatrix}^T$
+Dùng phương pháp lũy thừa để tìm giá trị riêng trội và véc tơ riêng tương ứng.
 
-### 4. Bảng tổng hợp các giá trị xấp xỉ
-| k | $x_1$ | $x_2$ |
-| :--- | :--- | :--- |
-| 0 | 2.3000000 | -1.1000000 |
-| 1 | 2.3091618 | -1.1563308 |
-| 2 | 2.3094203 | -1.1545992 |
-| 3 | 2.3093999 | -1.1547068 |
-| 4 | 2.3094012 | -1.1547002 |
-| 5 | 2.3094011 | -1.1547006 |
+Các tham số sử dụng:
 
-=> **KẾT LUẬN:** Nghiệm xấp xỉ của hệ sau 5 bước lặp là:
-  $$X \approx \begin{pmatrix} 2.3094011 \\ -1.1547006 \end{pmatrix}$$
+- Sai số: \(\varepsilon=0.0000001\)
+- Số bước lặp tối đa: \(N=200\)
+- Chế độ xuất lời giải: `exam`
+
+## Phương pháp lũy thừa
+
+Ta chọn véc tơ ban đầu
+
+$$
+x^{(0)}=\begin{pmatrix}
+1.0000000\\
+1.0000000\\
+1.0000000\\
+1.0000000
+\end{pmatrix}
+$$
+
+Tại mỗi bước, tính
+
+$$
+y^{(k)}=Ax^{(k)}.
+$$
+
+Chọn chỉ số \(s\) sao cho
+
+$$
+|y_s^{(k)}|=\max_i |y_i^{(k)}|,
+$$
+
+rồi chuẩn hóa
+
+$$
+x^{(k+1)}=\frac{y^{(k)}}{y_s^{(k)}}.
+$$
+
+Cột sai số trong bảng được tính bằng chuẩn của vector dư:
+
+$$
+r^{(k)}=\left\|Ax^{(k+1)}-\lambda^{(k)}x^{(k+1)}\right\|_2.
+$$
+
+| \(k\) | \(y^{(k)}=Ax^{(k)}\) | Chuẩn hóa | \(x^{(k+1)}\) | \(\lambda^{(k)}\) | Sai số |
+|---:|---|---|---|---:|---:|
+| 1 | \((43.0000000, 64.0000000, 58.0000000, 77.0000000)^T\) | \(s=4,\ y_s=77.0000000\) | \((0.5584416, 0.8311688, 0.7532468, 1.0000000)^T\) | 77.0000000 | 22.1223769 |
+| 2 | \((32.9870130, 53.7142857, 46.0909091, 65.1038961)^T\) | \(s=4,\ y_s=65.1038961\) | \((0.5066826, 0.8250549, 0.7079593, 1.0000000)^T\) | 65.1038961 | 2.6470055 |
+| 3 | \((31.6880112, 52.6898065, 44.5755037, 63.6991821)^T\) | \(s=4,\ y_s=63.6991821\) | \((0.4974634, 0.8271661, 0.6997814, 1.0000000)^T\) | 63.6991821 | 0.3846046 |
+| 4 | \((31.4682110, 52.6017775, 44.3482701, 63.4986221)^T\) | \(s=4,\ y_s=63.4986221\) | \((0.4955731, 0.8283924, 0.6984131, 1.0000000)^T\) | 63.4986221 | 0.0551583 |
+| 5 | \((31.4297109, 52.6118488, 44.3186475, 63.4745130)^T\) | \(s=4,\ y_s=63.4745130\) | \((0.4951548, 0.8288657, 0.6982117, 1.0000000)^T\) | 63.4745130 | 0.0118932 |
+| 6 | \((31.4231139, 52.6215550, 44.3168455, 63.4738281)^T\) | \(s=4,\ y_s=63.4738281\) | \((0.4950562, 0.8290276, 0.6981908, 1.0000000)^T\) | 63.4738281 | 0.0044899 |
+| 7 | \((31.4220530, 52.6257245, 44.3176308, 63.4748442)^T\) | \(s=4,\ y_s=63.4748442\) | \((0.4950316, 0.8290800, 0.6981920, 1.0000000)^T\) | 63.4748442 | 0.0016630 |
+| 8 | \((31.4219063, 52.6272152, 44.3181163, 63.4753794)^T\) | \(s=4,\ y_s=63.4753794\) | \((0.4950251, 0.8290965, 0.6981938, 1.0000000)^T\) | 63.4753794 | 0.0005682 |
+| 9 | \((31.4218944, 52.6277088, 44.3183094, 63.4755836)^T\) | \(s=4,\ y_s=63.4755836\) | \((0.4950233, 0.8291016, 0.6981946, 1.0000000)^T\) | 63.4755836 | 0.0001846 |
+| 10 | \((31.4218969, 52.6278660, 44.3183764, 63.4756533)^T\) | \(s=4,\ y_s=63.4756533\) | \((0.4950228, 0.8291032, 0.6981949, 1.0000000)^T\) | 63.4756533 | 0.0000583 |
+| 11 | \((31.4218987, 52.6279150, 44.3183983, 63.4756759)^T\) | \(s=4,\ y_s=63.4756759\) | \((0.4950227, 0.8291037, 0.6981950, 1.0000000)^T\) | 63.4756759 | 0.0000181 |
+| 12 | \((31.4218995, 52.6279301, 44.3184052, 63.4756830)^T\) | \(s=4,\ y_s=63.4756830\) | \((0.4950226, 0.8291038, 0.6981950, 1.0000000)^T\) | 63.4756830 | 0.0000056 |
+| 13 | \((31.4218998, 52.6279348, 44.3184074, 63.4756852)^T\) | \(s=4,\ y_s=63.4756852\) | \((0.4950226, 0.8291038, 0.6981950, 1.0000000)^T\) | 63.4756852 | 0.0000017 |
+| 14 | \((31.4218999, 52.6279362, 44.3184080, 63.4756859)^T\) | \(s=4,\ y_s=63.4756859\) | \((0.4950226, 0.8291039, 0.6981950, 1.0000000)^T\) | 63.4756859 | 0.0000005 |
+| 15 | \((31.4218999, 52.6279366, 44.3184082, 63.4756861)^T\) | \(s=4,\ y_s=63.4756861\) | \((0.4950226, 0.8291039, 0.6981950, 1.0000000)^T\) | 63.4756861 | 0.0000002 |
+| 16 | \((31.4218999, 52.6279367, 44.3184083, 63.4756861)^T\) | \(s=4,\ y_s=63.4756861\) | \((0.4950226, 0.8291039, 0.6981950, 1.0000000)^T\) | 63.4756862 | 0.0000000 |
+
+Dãy lặp hội tụ theo sai số đã chọn.
+
+Suy ra giá trị riêng trội xấp xỉ
+
+$$
+\lambda_1\approx 63.4756862.
+$$
+
+Véc tơ riêng tương ứng có thể lấy là
+
+$$
+v_1\approx \begin{pmatrix}
+0.3182167\\
+0.5329751\\
+0.4488226\\
+0.6428327
+\end{pmatrix}.
+$$
+
+## Kiểm tra trường hợp
+
+Ta kiểm tra lần lượt theo thứ tự:
+
+$$
+\text{TH1} \rightarrow \text{TH2} \rightarrow \text{TH3}.
+$$
+
+### Kiểm tra TH1
+
+TH1 xảy ra khi dãy lặp hội tụ trực tiếp, tức là \(x^{(k+1)}\approx x^{(k)}\) và \(\lambda^{(k)}\) ổn định.
+
+Ta dùng đại lượng kiểm tra
+
+$$
+E_1=\max\left\{\frac{|\lambda^{(k)}-\lambda^{(k-1)}|}{\max(1,|\lambda^{(k)}|)},\frac{\left\|Ax^{(k+1)}-\lambda^{(k)}x^{(k+1)}\right\|_2}{\max(1,|\lambda^{(k)}|)}\right\}.
+$$
+
+Ở bước cuối, sai số kiểm tra xấp xỉ:
+
+$$
+E_1=0.0000000,\qquad \varepsilon_1=0.0000010.
+$$
+
+Vì \(E_1\le \varepsilon_1\), bài toán thuộc TH1.
+
+## Phương pháp xuống thang
+
+Sau khi tìm được \((\lambda_1,v_1)\), tìm véc tơ riêng trái \(w_1\) từ \(A^T w_1=\lambda_1w_1\), rồi đặt
+
+$$
+A_1=A-\frac{\lambda_1}{w_1^Tv_1}v_1w_1^T.
+$$
+
+### Xuống thang lần 1
+
+Từ TH1, ta lấy trị riêng và véc tơ riêng phải:
+
+$$
+\lambda_1\approx 63.4756862,\qquad v_1\approx \begin{pmatrix}
+0.3182167\\
+0.5329751\\
+0.4488226\\
+0.6428327
+\end{pmatrix}
+$$
+
+Tìm véc tơ riêng trái từ hệ \((A^T-\lambda I)w=0\):
+
+$$
+w_1\approx \begin{pmatrix}
+0.3182167\\
+0.5329751\\
+0.4488226\\
+0.6428327
+\end{pmatrix}
+$$
+
+Mẫu số
+
+$$
+w_1^Tv_1=1.0000000.
+$$
+
+Ma trận sau khi xuống thang:
+
+$$
+A_1=\begin{pmatrix}
+8.5723 & -6.7656 & 1.9342 & 0.0154\\
+-6.7656 & 11.9689 & -1.1841 & -5.7476\\
+1.9342 & -1.1841 & 6.2133 & -4.3139\\
+0.0154 & -5.7476 & -4.3139 & 7.7697
+\end{pmatrix}
+$$
+
+Tiếp tục áp dụng phương pháp lũy thừa cho \(A_1\), ta thu được giá trị riêng trội tiếp theo
+
+$$
+\lambda_2\approx 19.1887544.
+$$
+
+Véc tơ riêng tương ứng trong bài toán sau xuống thang là
+
+$$
+\tilde v_2\approx \begin{pmatrix}
+-0.4985235\\
+0.7764896\\
+-0.0171672\\
+-0.3850241
+\end{pmatrix}.
+$$
+
+### Xuống thang lần 2
+
+Từ TH1, ta lấy trị riêng và véc tơ riêng phải:
+
+$$
+\lambda_2\approx 19.1887544,\qquad v_2\approx \begin{pmatrix}
+-0.4985235\\
+0.7764896\\
+-0.0171672\\
+-0.3850241
+\end{pmatrix}
+$$
+
+Tìm véc tơ riêng trái từ hệ \((A^T-\lambda I)w=0\):
+
+$$
+w_2\approx \begin{pmatrix}
+-0.4985236\\
+0.7764896\\
+-0.0171673\\
+-0.3850239
+\end{pmatrix}
+$$
+
+Mẫu số
+
+$$
+w_2^Tv_2=1.0000000.
+$$
+
+Ma trận sau khi xuống thang:
+
+$$
+A_2=\begin{pmatrix}
+3.8034 & 0.6624 & 1.7700 & -3.6678\\
+0.6624 & 0.3993 & -0.9283 & -0.0108\\
+1.7700 & -0.9283 & 6.2077 & -4.4407\\
+-3.6678 & -0.0108 & -4.4407 & 4.9251
+\end{pmatrix}
+$$
+
+Tiếp tục áp dụng phương pháp lũy thừa cho \(A_2\), ta thu được giá trị riêng trội tiếp theo
+
+$$
+\lambda_3\approx 11.8534265.
+$$
+
+Véc tơ riêng tương ứng trong bài toán sau xuống thang là
+
+$$
+\tilde v_3\approx \begin{pmatrix}
+0.4288112\\
+-0.0264630\\
+0.6399207\\
+-0.6371202
+\end{pmatrix}.
+$$
+
+### Xuống thang lần 3
+
+Từ TH1, ta lấy trị riêng và véc tơ riêng phải:
+
+$$
+\lambda_3\approx 11.8534265,\qquad v_3\approx \begin{pmatrix}
+0.4288112\\
+-0.0264630\\
+0.6399207\\
+-0.6371202
+\end{pmatrix}
+$$
+
+Tìm véc tơ riêng trái từ hệ \((A^T-\lambda I)w=0\):
+
+$$
+w_3\approx \begin{pmatrix}
+-0.4288114\\
+0.0264633\\
+-0.6399207\\
+0.6371200
+\end{pmatrix}
+$$
+
+Mẫu số
+
+$$
+w_3^Tv_3=-1.0000000.
+$$
+
+Ma trận sau khi xuống thang:
+
+$$
+A_3=\begin{pmatrix}
+1.6238 & 0.7969 & -1.4826 & -0.4293\\
+0.7969 & 0.3910 & -0.7276 & -0.2107\\
+-1.4826 & -0.7276 & 1.3537 & 0.3920\\
+-0.4293 & -0.2107 & 0.3920 & 0.1135
+\end{pmatrix}
+$$
+
+Tiếp tục áp dụng phương pháp lũy thừa cho \(A_3\), ta thu được giá trị riêng trội tiếp theo
+
+$$
+\lambda_4\approx 3.4821329.
+$$
+
+Véc tơ riêng tương ứng trong bài toán sau xuống thang là
+
+$$
+\tilde v_4\approx \begin{pmatrix}
+0.6828860\\
+0.3351137\\
+-0.6235102\\
+-0.1805563
+\end{pmatrix}.
+$$
+
+## Kết luận
+
+Giá trị riêng trội tìm được là
+
+$$
+\lambda_1\approx 63.4756862.
+$$
+
+Véc tơ riêng tương ứng là
+
+$$
+v_1\approx \begin{pmatrix}
+0.3182167\\
+0.5329751\\
+0.4488226\\
+0.6428327
+\end{pmatrix}.
+$$
+
+Các giá trị riêng tiếp theo tìm được bằng xuống thang:
+
+- \(\lambda_2\approx 19.1887544\)
+- \(\lambda_3\approx 11.8534265\)
+- \(\lambda_4\approx 3.4821329\)
+
