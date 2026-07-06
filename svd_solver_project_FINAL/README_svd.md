@@ -21,6 +21,8 @@ Trong giao dien:
 python svd_gui.py --input svd_input.txt --output svd_solution.md
 ```
 
+ ## Đơn giản hơn thì chỉ cần vào file có chữ gui rồi ấn run là được ##
+
 ## Dinh dang input
 
 ```text
