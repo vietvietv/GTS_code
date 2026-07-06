@@ -20,7 +20,7 @@ Trong giao dien:
 ```bash
 python dominant_eigen_gui.py --input dominant_input.txt --output dominant_solution.md
 ```
-
+## Đơn giản hơn thì chỉ cần vào file có chữ gui rồi ấn run là được ##
 ## Dinh dang input
 
 ```text
