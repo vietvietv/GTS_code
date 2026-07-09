@@ -1,6 +1,6 @@
-# Lời giải khai triển kỳ dị SVD
+# Lời giải tìm giá trị riêng trội
 
-> Các phép tính bên trong dùng giá trị gốc. Ma trận trình bày 4 chữ số thập phân; các số liệu khác lấy 7 chữ số thập phân.
+> Các phép tính bên trong dùng giá trị gốc. Ma trận trình bày 4 chữ số thập phân; các số liệu khác 7 chữ số thập phân.
 
 ## Bài toán
 
@@ -8,299 +8,250 @@ Cho ma trận
 
 $$
 A=\begin{pmatrix}
-3.0000 & 1.0000 & 0.0000 & 2.0000 & 1.0000 & 0.0000\\
-0.0000 & 2.0000 & 4.0000 & 1.0000 & 0.0000 & 3.0000\\
-1.0000 & 0.0000 & 2.0000 & 3.0000 & 2.0000 & 1.0000\\
-2.0000 & 3.0000 & 1.0000 & 0.0000 & 4.0000 & 2.0000
+86.0000 & 72.0000 & 149.0000\\
+72.0000 & 194.0000 & 221.0000\\
+149.0000 & 221.0000 & 330.0000
 \end{pmatrix}
 $$
 
-Ở đây \(A\in\mathbb{R}^{4\times 6}\).
+Dùng phương pháp lũy thừa để tìm giá trị riêng trội và véc tơ riêng tương ứng.
 
-## Bước 1. Quy SVD về bài toán trị riêng
+Các tham số sử dụng:
 
-Vì \(m<n\), ta lập
+- Sai số: \(\varepsilon=0.0000001\)
+- Số bước lặp tối đa: \(N=300\)
+- Chế độ xuất lời giải: `exam`
 
-$$
-C=AA^T.
-$$
+## Phương pháp lũy thừa
 
-Khi đó các véc tơ kỳ dị trái \(u_i\) là véc tơ riêng của \(C\):
-
-$$
-Cu_i=\lambda_i u_i,\qquad \sigma_i=\sqrt{\lambda_i},\qquad v_i=\frac{A^Tu_i}{\sigma_i}.
-$$
-
-Ta có
+Ta chọn véc tơ ban đầu
 
 $$
-C=\begin{pmatrix}
-15.0000 & 4.0000 & 11.0000 & 13.0000\\
-4.0000 & 30.0000 & 14.0000 & 16.0000\\
-11.0000 & 14.0000 & 19.0000 & 14.0000\\
-13.0000 & 16.0000 & 14.0000 & 34.0000
+x^{(0)}=\begin{pmatrix}
+1.0000000\\
+1.0000000\\
+1.0000000
 \end{pmatrix}
 $$
 
-## Bước 2. Tìm trị riêng bằng phương pháp lũy thừa và xuống thang
-
-Áp dụng phương pháp lũy thừa cho ma trận đối xứng ở trên, sau mỗi trị riêng thì xuống thang
-
-Trước khi xuống thang, véc tơ riêng được chuẩn hóa theo chuẩn 2:
+Tại mỗi bước, tính
 
 $$
-q_k\leftarrow \frac{q_k}{\|q_k\|_2},\qquad \|q_k\|_2=1.
+y^{(k)}=Ax^{(k)}.
 $$
 
-Do đó công thức xuống thang dùng trong bài là
+Chọn chỉ số \(s\) sao cho
 
 $$
-M_{k+1}=M_k-\lambda_k q_kq_k^T
+|y_s^{(k)}|=\max_i |y_i^{(k)}|,
 $$
 
-để tìm trị riêng tiếp theo.
-
-Sai số dư trong bảng được tính bởi
+rồi chuẩn hóa
 
 $$
-r_i=\|Mq_i-\lambda_iq_i\|_2.
+x^{(k+1)}=\frac{y^{(k)}}{y_s^{(k)}}.
 $$
 
-Nếu \(r_i\) càng nhỏ thì cặp \((\lambda_i,q_i)\) càng gần với trị riêng và véc tơ riêng đúng.
-
-| \(i\) | \(\lambda_i\) | \(\sigma_i=\sqrt{\lambda_i}\) | Số lặp | Sai số dư |
-|---:|---:|---:|---:|---:|
-| 1 | 63.4756862 | 7.9671630 | 12 | 0.0000026 |
-| 2 | 19.1887544 | 4.3804971 | 34 | 0.0000017 |
-| 3 | 11.8534265 | 3.4428806 | 15 | 0.0000004 |
-| 4 | 3.4821329 | 1.8660474 | 2 | 0.0000000 |
-
-## Bước 3. Giá trị kỳ dị và hạng
-
-Với mỗi trị riêng của ma trận đối xứng vừa xét:
+Cột sai số trong bảng được tính bằng chuẩn của vector dư:
 
 $$
-\lambda_i>0\Rightarrow \sigma_i=\sqrt{\lambda_i}>0,\qquad \lambda_i=0\Rightarrow \sigma_i=0.
+r^{(k)}=\left\|Ax^{(k+1)}-\lambda^{(k)}x^{(k+1)}\right\|_2.
 $$
 
-Số giá trị kỳ dị khác 0 chính là hạng của ma trận.
+| \(k\) | \(y^{(k)}=Ax^{(k)}\) | Chuẩn hóa | \(x^{(k+1)}\) | \(\lambda^{(k)}\) | Sai số |
+|---:|---|---|---|---:|---:|
+| 1 | \((307.0000000, 487.0000000, 700.0000000)^T\) | \(s=3,\ y_s=700.0000000\) | \((0.4385714, 0.6957143, 1.0000000)^T\) | 700.0000000 | 193.8783165 |
+| 2 | \((236.8085714, 387.5457143, 549.1000000)^T\) | \(s=3,\ y_s=549.1000000\) | \((0.4312667, 0.7057835, 1.0000000)^T\) | 549.1000000 | 1.8274639 |
+| 3 | \((236.9053516, 388.9732029, 550.2368967)^T\) | \(s=3,\ y_s=550.2368967\) | \((0.4305516, 0.7069195, 1.0000000)^T\) | 550.2368967 | 0.2231980 |
+| 4 | \((236.9256392, 389.1420988, 550.3813956)^T\) | \(s=3,\ y_s=550.3813956\) | \((0.4304754, 0.7070408, 1.0000000)^T\) | 550.3813956 | 0.0238541 |
+| 5 | \((236.9278196, 389.1601412, 550.3968467)^T\) | \(s=3,\ y_s=550.3968467\) | \((0.4304673, 0.7070537, 1.0000000)^T\) | 550.3968467 | 0.0025437 |
+| 6 | \((236.9280522, 389.1620652, 550.3984944)^T\) | \(s=3,\ y_s=550.3984944\) | \((0.4304664, 0.7070551, 1.0000000)^T\) | 550.3984944 | 0.0002712 |
+| 7 | \((236.9280770, 389.1622703, 550.3986701)^T\) | \(s=3,\ y_s=550.3986701\) | \((0.4304663, 0.7070553, 1.0000000)^T\) | 550.3986701 | 0.0000289 |
+| 8 | \((236.9280796, 389.1622922, 550.3986888)^T\) | \(s=3,\ y_s=550.3986888\) | \((0.4304663, 0.7070553, 1.0000000)^T\) | 550.3986888 | 0.0000031 |
+| 9 | \((236.9280799, 389.1622945, 550.3986908)^T\) | \(s=3,\ y_s=550.3986908\) | \((0.4304663, 0.7070553, 1.0000000)^T\) | 550.3986908 | 0.0000003 |
+| 10 | \((236.9280799, 389.1622948, 550.3986910)^T\) | \(s=3,\ y_s=550.3986910\) | \((0.4304663, 0.7070553, 1.0000000)^T\) | 550.3986910 | 0.0000000 |
+| 11 | \((236.9280799, 389.1622948, 550.3986910)^T\) | \(s=3,\ y_s=550.3986910\) | \((0.4304663, 0.7070553, 1.0000000)^T\) | 550.3986911 | 0.0000000 |
 
-Các giá trị kỳ dị khác 0 là
+Dãy lặp hội tụ theo sai số đã chọn.
+
+Suy ra giá trị riêng trội xấp xỉ
 
 $$
-\sigma_1=7.9671630,\quad \sigma_2=4.3804971,\quad \sigma_3=3.4428806,\quad \sigma_4=1.8660474.
+\lambda_1\approx 550.3986911.
 $$
 
-Suy ra \(\operatorname{rank}(A)=4\).
-
-## Bước 4. Vector kỳ dị
-
-Với \(\sigma_1=7.9671630\), ta có
+Véc tơ riêng tương ứng có thể lấy là
 
 $$
 v_1\approx \begin{pmatrix}
-0.3375277\\
-0.4157898\\
-0.4609393\\
-0.3157807\\
-0.4753503\\
-0.4183940
-\end{pmatrix},\qquad u_1\approx \begin{pmatrix}
-0.3182168\\
-0.5329751\\
-0.4488226\\
-0.6428328
+0.3315964\\
+0.5446581\\
+0.7703190
 \end{pmatrix}.
 $$
 
-Các véc tơ này đã được chuẩn hóa:
+## Kiểm tra trường hợp
+
+Ta kiểm tra lần lượt theo thứ tự:
 
 $$
-\|v_1\|_2=1.0000000,\qquad \|u_1\|_2=1.0000000.
+\text{TH1} \rightarrow \text{TH2} \rightarrow \text{TH3}.
 $$
 
-Với \(\sigma_2=4.3804971\), ta có
+### Kiểm tra TH1
+
+TH1 xảy ra khi dãy lặp hội tụ trực tiếp, tức là \(x^{(k+1)}\approx x^{(k)}\) và \(\lambda^{(k)}\) ổn định.
+
+Ta dùng đại lượng kiểm tra
 
 $$
-v_2\approx \begin{pmatrix}
-0.5211247\\
-0.0229691\\
--0.6133095\\
-0.0621068\\
-0.4732233\\
--0.3520729
-\end{pmatrix},\qquad u_2\approx \begin{pmatrix}
-0.4985235\\
--0.7764897\\
-0.0171671\\
-0.3850239
+E_1=\max\left\{\frac{|\lambda^{(k)}-\lambda^{(k-1)}|}{\max(1,|\lambda^{(k)}|)},\frac{\left\|Ax^{(k+1)}-\lambda^{(k)}x^{(k+1)}\right\|_2}{\max(1,|\lambda^{(k)}|)}\right\}.
+$$
+
+Ở bước cuối, sai số kiểm tra xấp xỉ:
+
+$$
+E_1=0.0000000,\qquad \varepsilon_1=0.0000010.
+$$
+
+Vì \(E_1\le \varepsilon_1\), bài toán thuộc TH1.
+
+## Phương pháp xuống thang
+
+Sau khi tìm được \((\lambda_1,v_1)\), tìm véc tơ riêng trái \(w_1\) từ \(A^T w_1=\lambda_1w_1\), rồi đặt
+
+$$
+A_1=A-\frac{\lambda_1}{w_1^Tv_1}v_1w_1^T.
+$$
+
+### Xuống thang lần 1
+
+Từ TH1, ta lấy trị riêng và véc tơ riêng phải:
+
+$$
+\lambda_1\approx 550.3986911,\qquad v_1\approx \begin{pmatrix}
+0.3315964\\
+0.5446581\\
+0.7703190
+\end{pmatrix}
+$$
+
+Tìm véc tơ riêng trái từ hệ \((A^T-\lambda I)w=0\):
+
+$$
+w_1\approx \begin{pmatrix}
+0.3315964\\
+0.5446581\\
+0.7703190
+\end{pmatrix}
+$$
+
+Mẫu số
+
+$$
+w_1^Tv_1=1.0000000.
+$$
+
+Ma trận sau khi xuống thang:
+
+$$
+A_1=\begin{pmatrix}
+25.4803 & -27.4057 & 8.4089\\
+-27.4057 & 30.7229 & -9.9256\\
+8.4089 & -9.9256 & 3.3982
+\end{pmatrix}
+$$
+
+Tiếp tục áp dụng phương pháp lũy thừa cho \(A_1\), ta thu được giá trị riêng trội tiếp theo
+
+$$
+\lambda_2\approx 58.6894315.
+$$
+
+Véc tơ riêng tương ứng trong bài toán sau xuống thang là
+
+$$
+\tilde v_2\approx \begin{pmatrix}
+-0.6534213\\
+0.7215563\\
+-0.2289043
 \end{pmatrix}.
 $$
 
-Các véc tơ này đã được chuẩn hóa:
+### Xuống thang lần 2
+
+Từ TH1, ta lấy trị riêng và véc tơ riêng phải:
 
 $$
-\|v_2\|_2=1.0000000,\qquad \|u_2\|_2=1.0000000.
+\lambda_2\approx 58.6894315,\qquad v_2\approx \begin{pmatrix}
+-0.6534213\\
+0.7215563\\
+-0.2289043
+\end{pmatrix}
 $$
 
-Với \(\sigma_3=3.4428806\), ta có
+Tìm véc tơ riêng trái từ hệ \((A^T-\lambda I)w=0\):
 
 $$
-v_3\approx \begin{pmatrix}
-0.1894097\\
--0.4459856\\
-0.1559358\\
-0.7990175\\
--0.2439316\\
--0.2073000
-\end{pmatrix},\qquad u_3\approx \begin{pmatrix}
-0.4288115\\
--0.0264633\\
-0.6399207\\
--0.6371200
+w_2\approx \begin{pmatrix}
+0.6534213\\
+-0.7215563\\
+0.2289043
+\end{pmatrix}
+$$
+
+Mẫu số
+
+$$
+w_2^Tv_2=-1.0000000.
+$$
+
+Ma trận sau khi xuống thang:
+
+$$
+A_2=\begin{pmatrix}
+0.4223 & 0.2652 & -0.3693\\
+0.2652 & 0.1666 & -0.2320\\
+-0.3693 & -0.2320 & 0.3230
+\end{pmatrix}
+$$
+
+Tiếp tục áp dụng phương pháp lũy thừa cho \(A_2\), ta thu được giá trị riêng trội tiếp theo
+
+$$
+\lambda_3\approx 0.9118774.
+$$
+
+Véc tơ riêng tương ứng trong bài toán sau xuống thang là
+
+$$
+\tilde v_3\approx \begin{pmatrix}
+0.6805031\\
+0.4274390\\
+-0.5951566
 \end{pmatrix}.
-$$
-
-Các véc tơ này đã được chuẩn hóa:
-
-$$
-\|v_3\|_2=1.0000000,\qquad \|u_3\|_2=1.0000000.
-$$
-
-Với \(\sigma_4=1.8660474\), ta có
-
-$$
-v_4\approx \begin{pmatrix}
-0.5702079\\
-0.4348468\\
--0.0466880\\
--0.0909117\\
--0.6893499\\
-0.0111028
-\end{pmatrix},\qquad u_4\approx \begin{pmatrix}
-0.6828859\\
-0.3351137\\
--0.6235103\\
--0.1805562
-\end{pmatrix}.
-$$
-
-Các véc tơ này đã được chuẩn hóa:
-
-$$
-\|v_4\|_2=1.0000000,\qquad \|u_4\|_2=1.0000000.
-$$
-
-## Bước 5. Khai triển SVD rút gọn
-
-Đặt
-
-$$
-U_r=\begin{pmatrix}
-0.3182 & 0.4985 & 0.4288 & 0.6829\\
-0.5330 & -0.7765 & -0.0265 & 0.3351\\
-0.4488 & 0.0172 & 0.6399 & -0.6235\\
-0.6428 & 0.3850 & -0.6371 & -0.1806
-\end{pmatrix}
-$$
-
-$$
-\Sigma_r=\begin{pmatrix}
-7.9672 & 0.0000 & 0.0000 & 0.0000\\
-0.0000 & 4.3805 & 0.0000 & 0.0000\\
-0.0000 & 0.0000 & 3.4429 & 0.0000\\
-0.0000 & 0.0000 & 0.0000 & 1.8660
-\end{pmatrix}
-$$
-
-$$
-V_r=\begin{pmatrix}
-0.3375 & 0.5211 & 0.1894 & 0.5702\\
-0.4158 & 0.0230 & -0.4460 & 0.4348\\
-0.4609 & -0.6133 & 0.1559 & -0.0467\\
-0.3158 & 0.0621 & 0.7990 & -0.0909\\
-0.4754 & 0.4732 & -0.2439 & -0.6893\\
-0.4184 & -0.3521 & -0.2073 & 0.0111
-\end{pmatrix}
-$$
-
-Khi đó
-
-$$
-A=U_r\Sigma_rV_r^T.
-$$
-
-Tương đương
-
-$$
-A=\sigma_1u_1v_1^T+\sigma_2u_2v_2^T+\sigma_3u_3v_3^T+\sigma_4u_4v_4^T.
-$$
-
-## Kiểm tra tái tạo
-
-Từ các thành phần SVD đã tìm được, ta tính lại
-
-$$
-\widehat A=U_r\Sigma_rV_r^T=\begin{pmatrix}
-3.0000 & 1.0000 & 0.0000 & 2.0000 & 1.0000 & 0.0000\\
-0.0000 & 2.0000 & 4.0000 & 1.0000 & 0.0000 & 3.0000\\
-1.0000 & 0.0000 & 2.0000 & 3.0000 & 2.0000 & 1.0000\\
-2.0000 & 3.0000 & 1.0000 & 0.0000 & 4.0000 & 2.0000
-\end{pmatrix}
-$$
-
-Sai số tái tạo theo chuẩn Frobenius là
-
-$$
-E=\|A-\widehat A\|_F=0.0000015.
-$$
-
-Vì đã lấy đủ số thành phần cần thiết, về lý thuyết ta có khai triển đúng của ma trận.
-
-## Nghịch đảo suy rộng
-
-Theo công thức Moore-Penrose,
-
-$$
-A^\dagger=V_r\Sigma_r^{-1}U_r^T.
-$$
-
-Suy ra
-
-$$
-A^\dagger=\begin{pmatrix}
-0.3050 & 0.0311 & -0.1343 & -0.0172\\
-0.1228 & 0.1053 & -0.2047 & 0.0760\\
--0.0491 & 0.1300 & 0.0681 & -0.0411\\
-0.0859 & -0.0124 & 0.1969 & -0.1081\\
--0.2098 & -0.1740 & 0.2136 & 0.1918\\
--0.0451 & 0.0940 & -0.0201 & 0.0401
-\end{pmatrix}
-$$
-
-## Số điều kiện
-
-Nếu các giá trị kỳ dị khác 0 phủ đủ số chiều cần xét thì
-
-$$
-\operatorname{cond}(A)=\frac{\sigma_{\max}}{\sigma_{\min}}.
-$$
-
-Nếu tồn tại \(\sigma_i=0\), ma trận bị suy biến theo nghĩa SVD và số điều kiện bằng \(+\infty\).
-
-Trong bài này ta có
-
-$$
-\operatorname{cond}(A)=\frac{\sigma_{\max}}{\sigma_{\min}}=4.2695395.
 $$
 
 ## Kết luận
 
-Khai triển kỳ dị rút gọn của ma trận là
+Giá trị riêng trội tìm được là
 
 $$
-A=U_r\Sigma_rV_r^T
+\lambda_1\approx 550.3986911.
 $$
 
-với các ma trận \(U_r,\Sigma_r,V_r\) đã tính ở trên; sai số tái tạo là \(E=0.0000015\).
+Véc tơ riêng tương ứng là
+
+$$
+v_1\approx \begin{pmatrix}
+0.3315964\\
+0.5446581\\
+0.7703190
+\end{pmatrix}.
+$$
+
+Các giá trị riêng tiếp theo tìm được bằng xuống thang:
+
+- \(\lambda_2\approx 58.6894315\)
+- \(\lambda_3\approx 0.9118774\)
 
